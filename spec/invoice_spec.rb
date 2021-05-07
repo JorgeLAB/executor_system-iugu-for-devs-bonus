@@ -1,4 +1,5 @@
 require 'spec_helper'
+require_relative '../lib/invoice_executor_system/executor_system'
 
 describe ExecutorSystem::Invoice do
   context '.load' do
@@ -8,25 +9,25 @@ describe ExecutorSystem::Invoice do
       returned_invoice = [
                            {
                             token: 'djakdjakjdkajdkajdkajdkj',
-                             company_payment_method: 'jsdkajksajdkjakjdakjkdaj',
+                             payment_method: 'jsdkajksajdkjakjdakjkdaj',
                              due_date: 1.days.from_now.strftime("%F"),
                              amount: 1000,
                              status: 'pending'
                            },
                            {
                              token: 'djdjakjdkajdkjakdjakjdaj',
-                             company_payment_method: 'dadkalskdlakdlkaldalkd',
+                             payment_method: 'dadkalskdlakdlkaldalkd',
                              due_date: 3.days.from_now.strftime("%F"),
                              amount: 1000,
                              status: 'pending'
                             }
                           ]
 
-      allow(Faraday).to receive(:get_request).and_return(returned_invoice)
+      allow(ExecutorSystem::Invoice).to receive(:get_request).and_return(returned_invoice)
 
       pending_invoices = ExecutorSystem::Invoice.load
 
-      expected(pending_invoices.count).to eq(returned_invoice.count)
+      expect(pending_invoices.count).to eq(returned_invoice.count)
     end
 
     it 'should have correct Invoice values attributes' do
@@ -34,52 +35,24 @@ describe ExecutorSystem::Invoice do
       returned_invoice = [
                           {
                             token: 'djakdjakjdkajdkajdkajdkj',
-                            company_payment_method: 'jsdkajksajdkjakjdakjkdaj',
+                            payment_method: 'jsdkajksajdkjakjdakjkdaj',
                             due_date: 1.days.from_now.strftime("%F"),
                             amount: 1000,
                             status: 'pending'
                           }
                          ]
 
-      allow(Faraday).to receive(:get_request).and_return(returned_invoice)
+      allow(ExecutorSystem::Invoice).to receive(:get_request).and_return(returned_invoice)
 
-      expected_executor_invoice = Invoice.new( token: 'djakdjakjdkajdkajdkajdkj',
-                                               payment_method: 'jsdkajksajdkjakjdakjkdaj',
-                                               due_date: 1.days.from_now.strftime("%F").gsub("-",""),
-                                               amount: 000100000,
-                                               status: 01
-                                             )
 
-      pending_invoices = ExecutorSystem::Invoice.load
+      pending_invoices = ExecutorSystem::Invoice.load.first
 
-      expect(pending_invoices).to eq(expected_executor_invoice)
-    end
-
-    it 'should returns correct executor_invoices' do
-
-      returned_invoice = [
-                           { token: 'djakdjakjdkajdkajdkajdkj',
-                             company_payment_method: 'jsdkajksajdkjakjdakjkdaj',
-                             due_date: 1.days.from_now.strftime("%F"),
-                             amount: 1000,
-                             status: 'pending'
-                           },
-                           {
-                             token: 'djdjakjdkajdkjakdjakjdaj',
-                             company_payment_method: 'dadkalskdlakdlkaldalkd',
-                             due_date: 3.days.from_now.strftime("%F"),
-                             amount: 1000,
-                             status: 'pending'
-                            }
-                          ]
-
-      allow(Faraday).to receive(:get_request).and_return(returned_invoice)
-
-      expected_invoices = executer_invoices_objects(returned_invoice)
-
-      pending_invoices = ExecutorSystem::Invoice.load
-
-      expected(pending_invoices).to contain_exactly **expected_invoices
+      expect(pending_invoices).to be_instance_of(ExecutorSystem::Invoice)
+      expect(pending_invoices.token).to eq 'djakdjakjdkajdkajdkajdkj'
+      expect(pending_invoices.payment_method).to eq 'jsdkajksajdkjakjdakjkdaj'
+      expect(pending_invoices.due_date).to  eq  1.days.from_now.strftime("%F").gsub("-","")
+      expect(pending_invoices.amount).to eq '0000100000'
+      expect(pending_invoices.status).to eq '01'
     end
   end
 end
