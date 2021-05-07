@@ -1,12 +1,4 @@
-require 'json'
+# frozen_string_literal: true
 
 class LoadSystem
-
-	def initialize(attributes = {})
-
-	end
-
-	def upload_invoices
-
-	end
 end

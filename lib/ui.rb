@@ -1,5 +1,6 @@
-class Ui
+# frozen_string_literal: true
 
+class Ui
   class << self
     def introduction
       puts 'Sistema de execução de cobranças'
