@@ -1,0 +1,37 @@
+[
+  {
+    "token": "5315babefff775cf77fd",
+    "payment_method": "token_boleto",
+    "due_date": "2021-05-04",
+    "amount": 1000,
+    "status": "pending"
+  },
+  {
+    "token": "b897e124e0d964c22f13",
+    "payment_method": "token_boleto",
+    "due_date": "2021-05-04",
+    "amount": 900.22,
+    "status": "pending"
+  },
+  {
+    "token": "8b343a17fca5d1ab7e28",
+    "payment_method": "token_boleto",
+    "due_date": "2021-05-04",
+    "amount": 10.44,
+    "status": "pending"
+  },
+  {
+    "token": "f0004e635176d28143b0",
+    "payment_method": "token_boleto",
+    "due_date": "2021-05-04",
+    "amount": 1.44,
+    "status": "pending"
+  },
+  {
+    "token": "edaa32451ebf14109c72",
+    "payment_method": "token_boleto",
+    "due_date": "2021-05-04",
+    "amount": 177.90,
+    "status": "pending"
+  }
+]
