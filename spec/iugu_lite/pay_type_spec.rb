@@ -3,7 +3,7 @@
 require 'pathname'
 require 'spec_helper'
 
-require_relative '../lib/iugu_lite/pay_type'
+require_relative '../../lib/iugu_lite/pay_type'
 
 describe IuguLite::PayType do
   let(:root) { Pathname.pwd }
