@@ -1,0 +1,15 @@
+[
+  {
+    "name": "Boleto",
+    "token": "token_boleto"
+  },
+  {
+    "name": "PIX",
+    "token": "token_pix"
+  },
+
+  {
+    "name": "Cartão de crédito",
+    "token": "token_card"
+  }
+]
