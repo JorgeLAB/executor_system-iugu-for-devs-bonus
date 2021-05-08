@@ -6,8 +6,7 @@ require 'spec_helper'
 require_relative '../../lib/iugu_lite/invoice'
 
 describe IuguLite::Invoice do
-
-  let(:root) { Pathname.pwd }
+  let!(:root) { Pathname.pwd }
 
   context '.load' do
 
@@ -46,8 +45,7 @@ describe IuguLite::Invoice do
   end
 
   context '.pending_invoices' do
-
-    it 'should returns 5 pending invoices' do
+    before do
       allow_any_instance_of(Faraday::Connection).to receive(:post)
         .with('invoices')
         .and_return(
@@ -57,22 +55,15 @@ describe IuguLite::Invoice do
                                                 symbolize_names: true)
           )
         )
+    end
 
+    it 'should returns 5 pending invoices' do
       invoices = described_class.pending_invoices
 
       expect(invoices.count).to eq(5)
     end
 
     it 'should returns correct invoices values attributes' do
-      allow_any_instance_of(Faraday::Connection).to receive(:post)
-        .with('invoices')
-        .and_return(
-          instance_double(
-            Faraday::Response, status: 200,
-                               body: JSON.parse(File.read(root.join('spec/fixtures/invoices.json')),
-                                                symbolize_names: true)
-          )
-        )
 
       expected_values = JSON.parse(File.read(root.join('spec/fixtures/invoices.json')),
                                                   symbolize_names: true)
