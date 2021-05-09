@@ -33,5 +33,76 @@
     "due_date": "2021-05-04",
     "amount": 177.90,
     "status": "pending"
+  },
+  {
+    "token": "a81e354f371f1a4f45a2",
+    "payment_method": "token_pix",
+    "due_date": "2021-05-04",
+    "amount": 1000,
+    "status": "pending"
+  },
+  {
+    "token": "c25d369428d9bfb11389",
+    "payment_method": "token_pix",
+    "due_date": "2021-05-04",
+    "amount": 900.22,
+    "status": "pending"
+  },
+  {
+    "token": "6690ac26369bc934384e",
+    "payment_method": "token_pix",
+    "due_date": "2021-05-04",
+    "amount": 10.44,
+    "status": "pending"
+  },
+  {
+    "token": "cfd3a110d42e8c9e51bb",
+    "payment_method": "token_pix",
+    "due_date": "2021-05-04",
+    "amount": 1.44,
+    "status": "pending"
+  },
+  {
+    "token": "0f8f572f8d8ce7627549",
+    "payment_method": "token_pix",
+    "due_date": "2021-05-04",
+    "amount": 177.90,
+    "status": "pending"
+  },
+
+  {
+    "token": "3aabdf289fb379361660",
+    "payment_method": "token_card",
+    "due_date": "2021-05-04",
+    "amount": 1000,
+    "status": "pending"
+  },
+  {
+    "token": "6c7b14daf5364b455164",
+    "payment_method": "token_card",
+    "due_date": "2021-05-04",
+    "amount": 900.22,
+    "status": "pending"
+  },
+  {
+    "token": "4c2754c5cb1985598178",
+    "payment_method": "token_card",
+    "due_date": "2021-05-04",
+    "amount": 10.44,
+    "status": "pending"
+  },
+  {
+    "token": "340361f2d814194cb43c",
+    "payment_method": "token_card",
+    "due_date": "2021-05-04",
+    "amount": 1.44,
+    "status": "pending"
+  },
+  {
+    "token": "e4a9df73552d1bfe2a6e",
+    "payment_method": "token_card",
+    "due_date": "2021-05-04",
+    "amount": 177.90,
+    "status": "pending"
   }
 ]
