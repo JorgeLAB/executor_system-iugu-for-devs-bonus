@@ -55,7 +55,7 @@ describe IuguLite::PayType do
           )
         )
 
-      paytype_name = described_class.search_name("token_boleto")
+      paytype_name = described_class.search_name('token_boleto')
 
       expect(paytype_name).to eq 'Boleto'
     end

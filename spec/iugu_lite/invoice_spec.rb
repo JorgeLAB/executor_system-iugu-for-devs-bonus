@@ -9,7 +9,6 @@ describe IuguLite::Invoice do
   let!(:root) { Pathname.pwd }
 
   context '.load' do
-
     it 'send request to iugu-lite and returns 5 invoices' do
       allow_any_instance_of(Faraday::Connection).to receive(:post)
         .with('invoices')
@@ -64,9 +63,8 @@ describe IuguLite::Invoice do
     end
 
     it 'should returns correct invoices values attributes' do
-
       expected_values = JSON.parse(File.read(root.join('spec/fixtures/invoices.json')),
-                                                  symbolize_names: true)
+                                   symbolize_names: true)
 
       invoices = described_class.pending_invoices
 
