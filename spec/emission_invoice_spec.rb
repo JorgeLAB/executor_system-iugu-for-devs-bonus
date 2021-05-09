@@ -69,4 +69,36 @@ describe ExecutorSystem::EmissionInvoice do
       end
     end
   end
+
+  context '.payment_method_separate' do
+    let!(:emission_invoices) do
+      emission_invoices = []
+
+      20.times do
+        emission_invoices << described_class
+                             .new(
+                               token: SecureRandom.hex(10),
+                               payment_method: ['Boleto', 'Card', 'PIX'].sample,
+                               due_date: 1.days.from_now.strftime('%Y%M%d'),
+                               amount: "0000#{rand(9)}00000",
+                               status: '01'
+                             )
+      end
+
+      emission_invoices
+    end
+
+    it 'should separate the emission invoices by payment method' do
+
+      expected_emission_invoice = { 'Boleto': [], 'Card': [], 'PIX': [] }
+
+      emission_invoices.each do |invoice|
+        expected_emission_invoice[invoice.payment_method.to_sym] << invoice
+      end
+
+      emission_invoices_separate = described_class.payment_method_separate(emission_invoices)
+
+      expect(emission_invoices_separate).to eq(expected_emission_invoice)
+    end
+  end
 end
