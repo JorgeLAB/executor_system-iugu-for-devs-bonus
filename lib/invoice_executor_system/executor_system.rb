@@ -33,6 +33,19 @@ module ExecutorSystem
         end
       end
 
+      def payment_method_separate(emission_invoices)
+
+        emission_list = {}
+
+        IuguLite::PayType.all.each { |pay_type| emission_list[pay_type.name.to_sym] = [] }
+
+        emission_invoices.each do |invoice|
+          emission_list[invoice.payment_method.to_sym] << invoice
+        end
+
+        emission_list
+      end
+
       def status_value(status)
         invoice_status = {
           pending: '01',
@@ -46,7 +59,15 @@ module ExecutorSystem
   end
 
   class FileEmission
-    def self.create(emission_invoices)
+
+    def self.generate_files(emission_invoices)
+      emission_invoices.each do |key, invoices|
+        emission_file = filename(key)
+        create(emission_file, invoices)
+      end
+    end
+
+    def self.create(filename, emission_invoices)
       emission_file = File.open(filename, 'w')
       header_file(emission_file, emission_invoices.size)
 
@@ -60,10 +81,11 @@ module ExecutorSystem
     end
 
     class << self
-      def filename
+
+      def filename(pay_type)
         root = Pathname.pwd
         timestamp = Time.now.strftime('%Y%M%d')
-        invoice_method = 'BOLETO'
+        invoice_method = pay_type.to_s.upcase
         root.join('db', 'emissions', "#{timestamp}_#{invoice_method}_EMISSAO.txt")
       end
 
