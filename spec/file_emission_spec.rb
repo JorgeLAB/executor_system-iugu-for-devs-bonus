@@ -4,6 +4,21 @@ require 'spec_helper'
 require_relative '../lib/invoice_executor_system/executor_system'
 
 describe ExecutorSystem::FileEmission do
+
+  before do
+    @root = Pathname.pwd
+
+    allow_any_instance_of(Faraday::Connection).to receive(:get)
+      .with('company_payment_methods')
+      .and_return(
+        instance_double(
+          Faraday::Response, status: 200,
+                             body: JSON.parse(File.read(@root.join('spec/fixtures/company_payment_methods.json')),
+                                              symbolize_names: true)
+        )
+      )
+  end
+
   context '.create' do
     let!(:root) { Pathname.pwd }
 
@@ -27,7 +42,7 @@ describe ExecutorSystem::FileEmission do
                            status: '01'
                          )
 
-      described_class.create([emission_invoice])
+      described_class.create(@filename,[emission_invoice])
 
       expect(File).to exist(@filename)
     end
@@ -45,7 +60,7 @@ describe ExecutorSystem::FileEmission do
       total_invoices = '00001'
       emission_invoice_header = "H #{total_invoices}\n"
 
-      described_class.create([emission_invoice])
+      described_class.create(@filename,[emission_invoice])
 
       file = File.open(@filename)
       header = file.readlines.first
@@ -71,7 +86,7 @@ describe ExecutorSystem::FileEmission do
 
       expected_body = "B #{token} #{due_date} #{amount} #{status}"
 
-      described_class.create([emission_invoice])
+      described_class.create(@filename,[emission_invoice])
 
       file = File.open(@filename)
       body_invoice = file.readlines.map(&:chomp)
@@ -93,7 +108,7 @@ describe ExecutorSystem::FileEmission do
       total_amount = '000000000100000'
       emission_invoice_footer = "F #{total_amount}"
 
-      described_class.create([emission_invoice])
+      described_class.create(@filename,[emission_invoice])
 
       file = File.open(@filename)
       footer = file.readlines.last
@@ -123,7 +138,7 @@ describe ExecutorSystem::FileEmission do
       it 'should have correct values in header' do
         emission_invoice_header = "H #{format('%05d' % emission_invoices.size)}"
 
-        described_class.create(emission_invoices)
+        described_class.create(@filename, emission_invoices)
 
         file = File.open(@filename)
         header_invoice = file.readlines.first.chomp
@@ -144,7 +159,7 @@ describe ExecutorSystem::FileEmission do
           expected_invoices << "B #{token} #{due_date} #{amount} #{status}"
         end
 
-        described_class.create(emission_invoices)
+        described_class.create(@filename, emission_invoices)
 
         file = File.open(@filename)
         body_invoice = file.readlines.map(&:chomp)
@@ -160,7 +175,7 @@ describe ExecutorSystem::FileEmission do
 
         emission_invoice_footer = "F #{format('%015d' % total_amount)}"
 
-        described_class.create(emission_invoices)
+        described_class.create(@filename, emission_invoices)
 
         file = File.open(@filename)
         header_invoice = file.readlines.last
@@ -168,6 +183,46 @@ describe ExecutorSystem::FileEmission do
 
         expect(emission_invoice_footer).to eq(header_invoice)
       end
+    end
+  end
+
+  context '.filename' do
+    let!(:emission_invoices) do
+      emission_invoices = []
+
+      20.times do
+        emission_invoices << ExecutorSystem::EmissionInvoice
+                               .new(
+                                 token: SecureRandom.hex(10),
+                                 payment_method: ['Boleto', 'Card', 'PIX'].sample,
+                                 due_date: 1.days.from_now.strftime('%Y%M%d'),
+                                 amount: "0000#{rand(9)}00000",
+                                 status: '01'
+                               )
+      end
+
+      emission_invoices
+    end
+
+    it 'should separate by payment method' do
+
+      payment_method_separate = ExecutorSystem::EmissionInvoice
+                                  .payment_method_separate(emission_invoices)
+
+      timestamp = Time.now.strftime('%Y%M%d')
+      expected_filenames = []
+      payment_method_separate.keys.each do |pay_type|
+        invoice_method = pay_type.to_s.upcase
+        expected_filenames << @root.join('db', 'emissions', "#{timestamp}_#{invoice_method}_EMISSAO.txt")
+      end
+
+      emission_filenames = []
+      payment_method_separate.keys.each do |pay_type|
+        invoice_method = pay_type.to_s.upcase
+        emission_filenames << described_class.filename( invoice_method )
+      end
+
+      expect(emission_filenames).to eq(expected_filenames)
     end
   end
 end
