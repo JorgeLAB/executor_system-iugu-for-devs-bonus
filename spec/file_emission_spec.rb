@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+
 require_relative '../lib/invoice_executor_system/executor_system'
+require_relative '../lib/iugu_lite/invoice'
 
 describe ExecutorSystem::FileEmission do
 
@@ -17,6 +19,16 @@ describe ExecutorSystem::FileEmission do
                                               symbolize_names: true)
         )
       )
+
+    allow_any_instance_of(Faraday::Connection).to receive(:post)
+        .with('invoices')
+        .and_return(
+          instance_double(
+            Faraday::Response, status: 200,
+                               body: JSON.parse(File.read(@root.join('spec/fixtures/invoices.json')),
+                                                symbolize_names: true)
+          )
+        )
   end
 
   context '.create' do
@@ -223,6 +235,29 @@ describe ExecutorSystem::FileEmission do
       end
 
       expect(emission_filenames).to eq(expected_filenames)
+    end
+  end
+
+  context '.generate_files' do
+
+    it 'should create emission files' do
+      timestamp = Time.now.strftime('%Y%M%d')
+      invoices = IuguLite::Invoice.pending_invoices
+
+      emission_invoices = ExecutorSystem::EmissionInvoice.create_emissions(invoices)
+      emission_invoices_list = ExecutorSystem::EmissionInvoice.payment_method_separate(emission_invoices)
+
+      file_boleto = @root.join('db', 'emissions', "#{timestamp}_BOLETO_EMISSAO.txt")
+      file_card = @root.join('db', 'emissions', "#{timestamp}_CARD_EMISSAO.txt")
+      file_pix = @root.join('db', 'emissions', "#{timestamp}_PIX_EMISSAO.txt")
+
+      described_class.generate_files(emission_invoices_list)
+
+      expect(File).to exist(file_boleto)
+      expect(File).to exist(file_card)
+      expect(File).to exist(file_pix)
+
+      File.delete(file_boleto, file_card, file_pix)
     end
   end
 end
