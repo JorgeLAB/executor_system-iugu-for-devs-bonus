@@ -21,7 +21,7 @@ describe IuguLite::Invoice do
         )
 
       invoices = described_class.load
-      expect(invoices.count).to eq 5
+      expect(invoices.count).to eq 15
     end
 
     it 'if timout request raise error' do
@@ -56,10 +56,10 @@ describe IuguLite::Invoice do
         )
     end
 
-    it 'should returns 5 pending invoices' do
+    it 'should returns pending invoices' do
       invoices = described_class.pending_invoices
 
-      expect(invoices.count).to eq(5)
+      expect(invoices.count).to eq(15)
     end
 
     it 'should returns correct invoices values attributes' do

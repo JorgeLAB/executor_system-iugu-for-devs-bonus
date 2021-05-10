@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+
 require_relative '../lib/invoice_executor_system/executor_system'
 require_relative '../lib/iugu_lite/invoice'
+require_relative '../lib/iugu_lite/pay_type'
 
 describe ExecutorSystem::EmissionInvoice do
   let(:root) { Pathname.pwd }
@@ -62,7 +64,7 @@ describe ExecutorSystem::EmissionInvoice do
       emission_invoices.each_with_index do |invoice, index|
         expect(invoice).to be_instance_of(ExecutorSystem::EmissionInvoice)
         expect(invoice.token).to eq expected_values[index][:token]
-        expect(invoice.payment_method).to eq 'Boleto'
+        expect(invoice.payment_method).to eq IuguLite::PayType.search_name(expected_values[index][:payment_method])
         expect(invoice.due_date).to eq expected_values[index][:due_date].gsub('-', '')
         expect(invoice.amount).to eq format('%010d', (expected_values[index][:amount] * 100))
         expect(invoice.status).to eq '01'
