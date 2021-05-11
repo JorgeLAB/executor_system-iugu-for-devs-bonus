@@ -34,7 +34,6 @@ module ExecutorSystem
         emission_list = {}
 
         IuguLite::PayType.all.each { |pay_type| emission_list[pay_type.name.to_sym] = [] }
-
         emission_invoices.each do |invoice|
           emission_list[invoice.payment_method.to_sym] << invoice
         end
