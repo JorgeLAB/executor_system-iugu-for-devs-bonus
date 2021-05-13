@@ -6,8 +6,6 @@ require_relative '../lib/invoice_executor_system/executor_system'
 require_relative '../lib/bank_system/bank_system'
 require_relative '../lib/iugu_lite/invoice'
 
-require 'pry'
-
 describe ExecutorSystem::ReturnInvoice do
 
   before do
@@ -82,6 +80,40 @@ describe ExecutorSystem::ReturnInvoice do
       end
 
       File.delete(bank_files_return.first)
+    end
+  end
+
+  context '.verified' do
+
+    let!(:emission_invoices) do
+      emission_invoices = []
+
+      20.times do
+        emission_invoices << ExecutorSystem::EmissionInvoice
+                              .new(
+                                token: SecureRandom.hex(10),
+                                payment_method: ['Boleto', 'Card', 'PIX'].sample,
+                                due_date: 1.days.from_now.strftime('%Y%M%d'),
+                                amount: "0000#{rand(9)}00000",
+                                status: '01'
+                              )
+      end
+
+      emission_invoices
+    end
+
+    it 'should move the bank file return for verified' do
+      bank_return_dir = @root.join('db','bank_return','*')
+      bank_files_return = Dir.glob(bank_return_dir)
+      bank_files_return_name = Dir.children(bank_return_dir.dirname).first
+      expected_create_file = @root.join('db','verified', "#{bank_files_return_name}.PRONTO")
+
+      described_class.verified
+
+      expect(File).to_not exist(bank_files_return.first)
+      expect(File).to exist(expected_create_file)
+
+      File.delete(expected_create_file)
     end
   end
 end
